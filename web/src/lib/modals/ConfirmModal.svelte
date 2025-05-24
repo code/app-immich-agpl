@@ -10,7 +10,7 @@
     confirmColor?: Color;
     disabled?: boolean;
     size?: 'small' | 'medium';
-    onClose: (confirmed: boolean) => void;
+    onClose: (confirmed?: boolean) => void;
     promptSnippet?: Snippet;
   }
 
@@ -30,7 +30,7 @@
   };
 </script>
 
-<Modal {title} onClose={() => onClose(false)} {size} class="bg-light text-dark">
+<Modal {title} onClose={() => onClose(false)} {size}>
   <ModalBody>
     {#if promptSnippet}{@render promptSnippet()}{:else}
       <p>{prompt}</p>

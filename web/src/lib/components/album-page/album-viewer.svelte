@@ -2,6 +2,7 @@
   import { shortcut } from '$lib/actions/shortcut';
   import AlbumMap from '$lib/components/album-page/album-map.svelte';
   import SelectAllAssets from '$lib/components/photos-page/actions/select-all-assets.svelte';
+  import AssetSelectControlBar from '$lib/components/photos-page/asset-select-control-bar.svelte';
   import { AssetInteraction } from '$lib/stores/asset-interaction.svelte';
   import { assetViewingStore } from '$lib/stores/asset-viewing.store';
   import { AssetStore } from '$lib/stores/assets-store.svelte';
@@ -16,11 +17,11 @@
   import CircleIconButton from '../elements/buttons/circle-icon-button.svelte';
   import DownloadAction from '../photos-page/actions/download-action.svelte';
   import AssetGrid from '../photos-page/asset-grid.svelte';
-  import AssetSelectControlBar from '../photos-page/asset-select-control-bar.svelte';
   import ControlAppBar from '../shared-components/control-app-bar.svelte';
   import ImmichLogoSmallLink from '../shared-components/immich-logo-small-link.svelte';
   import ThemeButton from '../shared-components/theme-button.svelte';
   import AlbumSummary from './album-summary.svelte';
+  import CastButton from '$lib/cast/cast-button.svelte';
 
   interface Props {
     sharedLink: SharedLinkResponseDto;
@@ -47,7 +48,7 @@
   });
 </script>
 
-<svelte:window
+<svelte:document
   use:shortcut={{
     shortcut: { key: 'Escape' },
     onShortcut: () => {
@@ -58,50 +59,7 @@
   }}
 />
 
-<header>
-  {#if assetInteraction.selectionActive}
-    <AssetSelectControlBar
-      ownerId={user?.id}
-      assets={assetInteraction.selectedAssets}
-      clearSelect={() => assetInteraction.clearMultiselect()}
-    >
-      <SelectAllAssets {assetStore} {assetInteraction} />
-      {#if sharedLink.allowDownload}
-        <DownloadAction filename="{album.albumName}.zip" />
-      {/if}
-    </AssetSelectControlBar>
-  {:else}
-    <ControlAppBar showBackButton={false}>
-      {#snippet leading()}
-        <ImmichLogoSmallLink />
-      {/snippet}
-
-      {#snippet trailing()}
-        {#if sharedLink.allowUpload}
-          <CircleIconButton
-            title={$t('add_photos')}
-            onclick={() => openFileUploadDialog({ albumId: album.id })}
-            icon={mdiFileImagePlusOutline}
-          />
-        {/if}
-
-        {#if album.assetCount > 0 && sharedLink.allowDownload}
-          <CircleIconButton
-            title={$t('download')}
-            onclick={() => downloadAlbum(album)}
-            icon={mdiFolderDownloadOutline}
-          />
-        {/if}
-        {#if sharedLink.showMetadata}
-          <AlbumMap {album} />
-        {/if}
-        <ThemeButton />
-      {/snippet}
-    </ControlAppBar>
-  {/if}
-</header>
-
-<main class="relative h-dvh overflow-hidden px-2 md:px-6 max-md:pt-[var(--navbar-height-md)] pt-[var(--navbar-height)]">
+<main class="relative h-dvh overflow-hidden px-2 md:px-6 max-md:pt-(--navbar-height-md) pt-(--navbar-height)">
   <AssetGrid enableRouting={true} {album} {assetStore} {assetInteraction}>
     <section class="pt-8 md:pt-24 px-2 md:px-0">
       <!-- ALBUM TITLE -->
@@ -126,3 +84,48 @@
     </section>
   </AssetGrid>
 </main>
+
+<header>
+  {#if assetInteraction.selectionActive}
+    <AssetSelectControlBar
+      ownerId={user?.id}
+      assets={assetInteraction.selectedAssets}
+      clearSelect={() => assetInteraction.clearMultiselect()}
+    >
+      <SelectAllAssets {assetStore} {assetInteraction} />
+      {#if sharedLink.allowDownload}
+        <DownloadAction filename="{album.albumName}.zip" />
+      {/if}
+    </AssetSelectControlBar>
+  {:else}
+    <ControlAppBar showBackButton={false}>
+      {#snippet leading()}
+        <ImmichLogoSmallLink />
+      {/snippet}
+
+      {#snippet trailing()}
+        <CastButton whiteHover />
+
+        {#if sharedLink.allowUpload}
+          <CircleIconButton
+            title={$t('add_photos')}
+            onclick={() => openFileUploadDialog({ albumId: album.id })}
+            icon={mdiFileImagePlusOutline}
+          />
+        {/if}
+
+        {#if album.assetCount > 0 && sharedLink.allowDownload}
+          <CircleIconButton
+            title={$t('download')}
+            onclick={() => downloadAlbum(album)}
+            icon={mdiFolderDownloadOutline}
+          />
+        {/if}
+        {#if sharedLink.showMetadata}
+          <AlbumMap {album} />
+        {/if}
+        <ThemeButton />
+      {/snippet}
+    </ControlAppBar>
+  {/if}
+</header>

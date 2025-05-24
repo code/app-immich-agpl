@@ -5,6 +5,7 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { clickOutside } from '$lib/actions/click-outside';
+  import CastButton from '$lib/cast/cast-button.svelte';
   import SkipLink from '$lib/components/elements/buttons/skip-link.svelte';
   import ImmichLogo from '$lib/components/shared-components/immich-logo.svelte';
   import NotificationPanel from '$lib/components/shared-components/navigation-bar/notification-panel.svelte';
@@ -30,10 +31,12 @@
 
   interface Props {
     showUploadButton?: boolean;
-    onUploadClick: () => void;
+    onUploadClick?: () => void;
+    // TODO: remove once this is only used in <AppShellHeader>
+    noBorder?: boolean;
   }
 
-  let { showUploadButton = true, onUploadClick }: Props = $props();
+  let { showUploadButton = true, onUploadClick, noBorder = false }: Props = $props();
 
   let shouldShowAccountInfoPanel = $state(false);
   let shouldShowNotificationPanel = $state(false);
@@ -49,13 +52,12 @@
 
 <svelte:window bind:innerWidth />
 
-<nav
-  id="dashboard-navbar"
-  class="z-auto max-md:h-[var(--navbar-height-md)] h-[var(--navbar-height)] w-dvw text-sm overflow-hidden"
->
+<nav id="dashboard-navbar" class="max-md:h-(--navbar-height-md) h-(--navbar-height) w-dvw text-sm overflow-hidden">
   <SkipLink text={$t('skip_to_content')} />
   <div
-    class="grid h-full grid-cols-[theme(spacing.32)_auto] items-center border-b py-2 dark:border-b-immich-dark-gray sidebar:grid-cols-[theme(spacing.64)_auto]"
+    class="grid h-full grid-cols-[--spacing(32)_auto] items-center py-2 sidebar:grid-cols-[--spacing(64)_auto] {noBorder
+      ? ''
+      : 'border-b'}"
   >
     <div class="flex flex-row gap-1 mx-4 items-center">
       <IconButton
@@ -103,7 +105,7 @@
           />
         {/if}
 
-        {#if !page.url.pathname.includes('/admin') && showUploadButton}
+        {#if !page.url.pathname.includes('/admin') && showUploadButton && onUploadClick}
           <Button
             leadingIcon={mdiTrayArrowUp}
             onclick={onUploadClick}
@@ -161,6 +163,8 @@
           {/if}
         </div>
 
+        <CastButton navBar />
+
         <div
           use:clickOutside={{
             onOutclick: () => (shouldShowAccountInfoPanel = false),
@@ -179,7 +183,10 @@
           </button>
 
           {#if shouldShowAccountInfoPanel}
-            <AccountInfoPanel onLogout={() => authManager.logout()} />
+            <AccountInfoPanel
+              onLogout={() => authManager.logout()}
+              onClose={() => (shouldShowAccountInfoPanel = false)}
+            />
           {/if}
         </div>
       </section>

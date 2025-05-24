@@ -206,7 +206,7 @@
   }
 </script>
 
-<svelte:window
+<svelte:document
   use:shortcuts={[
     { shortcut: { key: 'Escape' }, onShortcut: onEscape },
     { shortcut: { ctrl: true, key: 'k' }, onShortcut: () => input?.select() },
@@ -282,7 +282,7 @@
         class:end-28={isFocus && value.length > 0}
       >
         <p
-          class="bg-immich-primary text-white dark:bg-immich-dark-primary/90 dark:text-black/75 rounded-full px-3 py-1 text-xs z-10"
+          class="bg-immich-primary text-white dark:bg-immich-dark-primary/90 dark:text-black/75 rounded-full px-3 py-1 text-xs"
         >
           {getSearchTypeText()}
         </p>
